@@ -3,6 +3,14 @@ const app = express();
 const port = 5000;
 const fs = require('fs');
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log('Hello From the middleware');
+  next();
+});
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 app.get('/', (req, res) => {
   res.send('Hello From the server');
 });
@@ -12,8 +20,10 @@ const tours = JSON.parse(
 );
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours,
@@ -90,6 +100,7 @@ const deletTour = (req, res) => {
 // app.delete('/api/v1/tours/:id', deletTour);
 
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
+
 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deletTour);
 // Adding Update Data
 app.listen(port, () => {
