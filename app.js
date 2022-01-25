@@ -1,7 +1,11 @@
 const express = require('express');
-const app = express();
+const morgan = require('morgan');
 const port = 5000;
 const fs = require('fs');
+const app = express();
+// Video 14
+// 1st middlewrare
+app.use(morgan('tiny'));
 app.use(express.json());
 app.use((req, res, next) => {
   console.log('Hello From the middleware');
@@ -11,14 +15,11 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-app.get('/', (req, res) => {
-  res.send('Hello From the server');
-});
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
-
+// 2nd MIDDLWEre
 const getAllTours = (req, res) => {
   console.log(req.requestTime);
   res.status(200).json({
@@ -99,10 +100,11 @@ const deletTour = (req, res) => {
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deletTour);
 
+// 3rd MiddleWeare
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deletTour);
-// Adding Update Data
+// 4 Start The Server
 app.listen(port, () => {
   console.log(`app is runnning on port ${port}`);
 });
