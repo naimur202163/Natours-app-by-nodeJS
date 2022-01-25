@@ -11,7 +11,7 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -19,9 +19,8 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
-// Doplicate
-app.get('/api/v1/tours/:id', (req, res) => {
+};
+const getTour = (req, res) => {
   console.log(req.params);
   const id = req.params.id * 1;
 
@@ -39,10 +38,8 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour,
     },
   });
-});
-
-// Adding post Method
-app.post('/api/v1/tours', (req, res) => {
+};
+const createTour = (req, res) => {
   //   console.log(req.body);
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
@@ -58,23 +55,8 @@ app.post('/api/v1/tours', (req, res) => {
       });
     })
   );
-});
-
-// Delet
-app.delete('/api/v1/tours/:id', (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid Id',
-    });
-  }
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
-// Adding Update Data
-app.patch('/api/v1/tours/:id', (req, res) => {
+};
+const updateTour = (req, res) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
       status: 'fail',
@@ -87,8 +69,29 @@ app.patch('/api/v1/tours/:id', (req, res) => {
       tour: '<Update tour here...>',
     },
   });
-});
+};
+const deletTour = (req, res) => {
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid Id',
+    });
+  }
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};
+// All Routes
+// app.get('/api/v1/tours', getAllTours);
+// app.post('/api/v1/tours', createTour);
+// app.get('/api/v1/tours/:id', getTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deletTour);
 
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
+app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deletTour);
+// Adding Update Data
 app.listen(port, () => {
   console.log(`app is runnning on port ${port}`);
 });
